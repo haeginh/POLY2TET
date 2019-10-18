@@ -51,13 +51,13 @@ int main(int argc, char *argv[])
 	map<int, double> volMap = AnalyzeTet(tetFileName);
 	double maxVol(-1.);
 	int tempID;
-	ofstream ofsMass(fileName.substr(0, fileName.size() - 3) + "_mass.txt");
+	ofstream ofsVol(fileName.substr(0, fileName.size() - 3) + "_vol.txt");
 	for (auto vol : volMap) {
 		if (maxVol < vol.second) {
 			maxVol = vol.second;
 			tempID = vol.first;
 		}
-		ofsMass << vol.first << "\t" << vol.second << endl;
+		ofsVol << vol.first << "\t" << vol.second << endl;
 	}
 
 	if (maxVolID < 0) maxVolID = tempID;
