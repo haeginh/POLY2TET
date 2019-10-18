@@ -11,8 +11,12 @@ int main(int argc, char *argv[])
 	}
 
 	string fileName = argv[argc-1];
+
+/****For the OBJ files with the group names starting with "O_"****/
 //	string fileName;
 //	cout << "filename: "; cin >> fileName;
+
+
 	if (StringSplitterLast(fileName, ".") != "obj") {
 		cerr << "File format should be obj" << endl;
 		getchar();
