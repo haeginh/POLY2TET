@@ -67,5 +67,6 @@ int main(int argc, char *argv[])
 	if (maxVolID < 0) maxVolID = tempID;
 	ConvertZeroMat(maxVolID, fileName.substr(0, fileName.size() - 3) + "1.ele", largestR);
 
+	cout<<endl<<"--Conversion was done: "<<fileName.substr(0, fileName.size()-3)+"1.node/ele were exported"<<endl;
 	return 0;
 }
