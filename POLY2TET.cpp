@@ -29,13 +29,17 @@ int main(int argc, char *argv[])
 	if (largestR < 0) return -1;
 	string smeshName = fileName.substr(0, fileName.size() - 4) + ".smesh";
 
-	char* tetgen_name = new char[7];
-	tetgen_name = "tetgen";
-	char** p_argv = new char*[50];
+//	char* tetgen_name = new char[7];
+//	tetgen_name = "tetgen";
+	char** p_argv = new char*[3];
+	for(int i=0;i<3;i++) p_argv[i]=new char[50];
 
-	p_argv[0] = tetgen_name;
-	p_argv[1] = "-p/0.0001YAFT0.000000001";
-	p_argv[2] = (char*)smeshName.c_str();
+	strcpy(p_argv[0], string("tetgen").c_str());
+	strcpy(p_argv[1], string("-p/0.0001YAFT0.000000001").c_str());
+	strcpy(p_argv[2], smeshName.c_str());
+//	p_argv[0] = tetgen_name;
+//	p_argv[1] = "-p/0.0001YAFT0.000000001";
+//	p_argv[2] = smeshName.c_str();
 
 	bool repeat(true);
 	
@@ -55,7 +59,7 @@ int main(int argc, char *argv[])
 	map<int, double> volMap = AnalyzeTet(tetFileName);
 	double maxVol(-1.);
 	int tempID;
-	ofstream ofsVol(fileName.substr(0, fileName.size() - 3) + "_vol.txt");
+	ofstream ofsVol(fileName.substr(0, fileName.size() - 4) + "_vol.txt");
 	for (auto vol : volMap) {
 		if (maxVol < vol.second) {
 			maxVol = vol.second;
@@ -65,7 +69,14 @@ int main(int argc, char *argv[])
 	}
 
 	if (maxVolID < 0) maxVolID = tempID;
-	ConvertZeroMat(maxVolID, fileName.substr(0, fileName.size() - 3) + "1.ele", largestR);
+	ConvertZeroMat(maxVolID, tetFileName + ".ele", largestR);
+
+	//file renaming
+	int eleRename = rename((tetFileName + ".ele").c_str(),
+			               (tetFileName.substr(0, tetFileName.size()-1)+".ele").c_str());
+	int nodeRename = rename((tetFileName + ".node").c_str(),
+			                (tetFileName.substr(0, tetFileName.size()-1)+".node").c_str());
+	if(eleRename||nodeRename)	cerr<<"WARNING-rename failed."<<endl;
 
 	cout<<endl<<"--Conversion was done: "<<fileName.substr(0, fileName.size()-3)+"1.node/ele were exported"<<endl;
 	return 0;

@@ -16,7 +16,7 @@
 
 using namespace std;
 
-void FixObj(string fileName);
+void FixObj(string fileName); //for HUREL internal use.
 int ConvertOBJ(string fileName);
 vector<vector<int>> GetRepFaces(vector<vector<int>> faceVec); // get representative faces for each shells
 vector<pair<ThreeVector, int>> GetRegionList(vector<vector<int>> repFaces, vector<ThreeVector> vVec);
@@ -142,11 +142,6 @@ vector<pair<ThreeVector, int>> GetRegionList(vector<vector<int>> repFaces, vecto
 		regionList.push_back(make_pair(center + trans, aRepF[3]));
 	}
 
-/*	ofstream ofs("region.txt");
-	int id(1); ofs.precision(10);
-	for (auto r : regionList) {
-		ofs << id++ << " " << r.first << " " << r.second << endl;
-	}ofs.close();*/
 	return regionList;
 }
 
@@ -155,11 +150,9 @@ vector<vector<int>> SeparateShell(vector<vector<int>> facePool) {
 	
 	set<int> vToSearch, vToSearchNext;
 	vToSearch.insert(facePool.back().begin(), facePool.back().end());
-//	vector<vector<int>> collected;
 	vector<vector<int>> rest = facePool;
 	repFaces.push_back(rest.back());
 
-//	collected.push_back(rest.back());
 	rest.pop_back();
 
 	vector<vector<int>> restNext;
@@ -167,17 +160,14 @@ vector<vector<int>> SeparateShell(vector<vector<int>> facePool) {
 		while (1) { // loop for finding all faces for each separated shell
 			for (vector<int> f : rest) {
 				if (vToSearch.find(f[0]) != vToSearch.end()) {
-//					collected.push_back(f);
 					vToSearchNext.insert(f[1]);
 					vToSearchNext.insert(f[2]);
 				}
 				else if (vToSearch.find(f[1]) != vToSearch.end()) {
-//					collected.push_back(f);
 					vToSearchNext.insert(f[0]);
 					vToSearchNext.insert(f[2]);
 				}
 				else if (vToSearch.find(f[2]) != vToSearch.end()) {
-//					collected.push_back(f);
 					vToSearchNext.insert(f[0]);
 					vToSearchNext.insert(f[1]);
 				}
@@ -190,15 +180,12 @@ vector<vector<int>> SeparateShell(vector<vector<int>> facePool) {
 			rest = restNext;
 			restNext.clear();
 		}
-		//repFaces.push_back(collected[0]);
 		if (restNext.size() == 0) break;
 		rest = restNext; restNext.clear();
 
 		vToSearch.clear();
 		vToSearch.insert(rest.back().begin(), rest.back().end());
 		repFaces.push_back(rest.back());
-		//collected.clear();
-		//collected.push_back(rest.back());
 		rest.pop_back();
 	}
 	return repFaces;
@@ -210,11 +197,9 @@ vector<vector<int>> SeparateShell(vector<vector<int>> facePool, vector<int>& num
 
 	set<int> vToSearch, vToSearchNext;
 	vToSearch.insert(facePool.back().begin(), facePool.back().end());
-	//	vector<vector<int>> collected;
 	vector<vector<int>> rest = facePool;
 	repFaces.push_back(rest.back());
 
-	//	collected.push_back(rest.back());
 	rest.pop_back();
 
 	vector<vector<int>> restNext;
@@ -223,19 +208,16 @@ vector<vector<int>> SeparateShell(vector<vector<int>> facePool, vector<int>& num
 		while (1) { // loop for finding all faces for each separated shell
 			for (vector<int> f : rest) {
 				if (vToSearch.find(f[0]) != vToSearch.end()) {
-					//					collected.push_back(f);
 					vToSearchNext.insert(f[1]);
 					vToSearchNext.insert(f[2]);
 					count++;
 				}
 				else if (vToSearch.find(f[1]) != vToSearch.end()) {
-					//					collected.push_back(f);
 					vToSearchNext.insert(f[0]);
 					vToSearchNext.insert(f[2]);
 					count++;
 				}
 				else if (vToSearch.find(f[2]) != vToSearch.end()) {
-					//					collected.push_back(f);
 					vToSearchNext.insert(f[0]);
 					vToSearchNext.insert(f[1]);
 					count++;
@@ -249,7 +231,7 @@ vector<vector<int>> SeparateShell(vector<vector<int>> facePool, vector<int>& num
 			rest = restNext;
 			restNext.clear();
 		}
-		//repFaces.push_back(collected[0]);
+
 		if (restNext.size() == 0) break;
 		rest = restNext; restNext.clear();
 
@@ -257,8 +239,6 @@ vector<vector<int>> SeparateShell(vector<vector<int>> facePool, vector<int>& num
 		vToSearch.insert(rest.back().begin(), rest.back().end());
 		repFaces.push_back(rest.back());
 		numFace.push_back(count);
-		//collected.clear();
-		//collected.push_back(rest.back());
 		rest.pop_back();
 	}
 	return repFaces;
