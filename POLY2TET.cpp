@@ -1,5 +1,5 @@
-#include "POLY2TET.h"
-#include "FileGen.h"
+#include "./src/POLY2TET.h"
+#include "./src/FileGen.h"
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <errno.h>

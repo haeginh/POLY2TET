@@ -17,7 +17,6 @@
 /gps/pos/halfy {halfy} cm
 /gps/pos/rot1 1 0 0
 /gps/pos/rot2 0 0 1
-/gps/source/intensity {area}
 /gps/direction 0 1 0
 /gps/particle gamma
 /gps/energy 1 MeV

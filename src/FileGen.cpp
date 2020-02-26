@@ -6,6 +6,7 @@
  */
 
 #include "FileGen.h"
+#include "tet2inp.hpp"
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
@@ -64,30 +65,9 @@ void FileGen::ReadTetEle(){
 }
 
 void FileGen::GenerateG4(){
-	//execute bash script (copy the files and replace PHANTOM with phantomName)
     system(("./.Geant4_gen.sh "+phantomName + " " + to_string(beamHX) + " " + to_string(beamHZ)).c_str());
-	//system(("source ./.Geant4_gen.sh "+phantomName).c_str());
-//    char buff[50];
-//    FILE *fp;
-//	fp = popen(("./.Geant4_gen.sh "+phantomName + " " + to_string(beamHX) + " " + to_string(beamHZ)).c_str(),"r");
-//	fgets(buff, 20, fp);
-//	string newFolder = string(buff);
-//	cout<<"Geant4 files were generated in "+newFolder<<endl;
-//    pclose(fp);
-//
-//	//modify beam size
-//	ifstream ifs("./"+newFolder+"/_example.in");
-//	ofstream ofs("./"+newFolder+"/example.in");
-//	string buffer;
-//	string halfx("[halfx]"), halfy("[halfy]");
-//	while(getline(ifs, buffer)){
-//		auto pos1 = buffer.find(halfx);
-//		auto pos2 = buffer.find(halfy);
-//		if(pos1!=string::npos) buffer.replace(pos1, halfx.length(), to_string(beamHX));
-//		if(pos2!=string::npos) buffer.replace(pos2, halfy.length(), to_string(beamHZ));
-//		cout<<buffer<<endl;
-//	}
-//	ofs.close();
-//	ifs.close();
-//	remove (("./"+newFolder+"/_example.in").c_str());
+}
+
+void FileGen::GenerateM6(){
+
 }

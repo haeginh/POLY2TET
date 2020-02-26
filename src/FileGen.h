@@ -22,7 +22,7 @@ private:
 	void ReadTetNode();
 	void ReadTetEle();
 	void GenerateG4();
-	void GenerateM6(){};
+	void GenerateM6();
 	void GeneratePH(){};
 
 private:

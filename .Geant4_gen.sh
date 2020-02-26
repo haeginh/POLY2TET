@@ -25,16 +25,15 @@ for file in "${filelist[@]}"; do
 done
 
 ##Specify the phantom names
-find ${new_dir} -type f -exec sed -i -e "s/PHANTOM/$1/g" -e "s/NEWDIR/${new_dir}/g" -e "s/DEFAULTMAT/145/g" {} \;
+find ${new_dir} -type f -exec sed -i -e "s/PHANTOM/$1/g" -e "s/NEWDIR/${new_dir}/g" {} \;
 
 ##Specify beam size
 area=`expr $2 \* $3 \* 4`
-sed -e "s/{halfx}/$2/g" -e "s/{halfy}/$3/g" -e "s/{area}/${area}/g" ${new_dir}"/example.in">${new_dir}"/_example.in"
+sed -i -e "s/{halfx}/$2/g" -e "s/{halfy}/$3/g" -e "s/{area}/${area}/g" ${new_dir}"/example.in"
 
 ##Rename PHANTOM.cc ane example.in
 mv ${new_dir}"/PHANTOM.cc" ${new_dir}"/"$1".cc"
-mv ${new_dir}"/_example.in" ${new_dir}"/example.in"
 
 ##export path
 #export G4TET_dir=${new_dir}
-echo ${new_dir} 
+echo "Geant4 files were generated in "${new_dir} 
