@@ -5,4 +5,4 @@ cmake_minimum_required(VERSION 2.6)
 SET(CMAKE_CXX_FLAGS "-std=c++0x")
 
 # Add an executable to the project using the specified source files.
-add_executable(POLY2TET POLY2TET.cpp tetgen.cxx predicates.cxx ThreeVector.cpp)
+add_executable(POLY2TET POLY2TET.cpp tetgen.cxx predicates.cxx ThreeVector.cpp FileGen.cpp)

@@ -33,7 +33,7 @@ bool ChkDegenTet(ThreeVector anchor, ThreeVector p2, ThreeVector p3, ThreeVector
 double FixDegenTet(ThreeVector& anchor, ThreeVector& p2, ThreeVector& p3, ThreeVector& p4, double &vol6);
 double FixDegenTet2(ThreeVector& anchor, ThreeVector& p2, ThreeVector& p3, ThreeVector& p4, double &vol6);
 int  PrintVolume(string tetFile, ostream& os);
-void ConvertZeroMat(int rst, string eleFile, int largestR);
+bool ConvertZeroMat(int rst, string eleFile, int largestR, bool forcedChange);
 
 void FixObj(string fileName) {
 	ifstream ifs(fileName);
@@ -650,7 +650,7 @@ int PrintVolume(string tetFile, ostream& os) {
 	return maxVolID;
 }
 
-void ConvertZeroMat(int rst, string eleFile, int largestR) {
+bool ConvertZeroMat(int rst, string eleFile, int largestR, bool forcedChange) {
 	cout << "Modifying " + eleFile + "..." << flush;
 	ifstream ifs(eleFile);
 	int numEle, tempInt, a, c, b, d, id, count(0);
@@ -673,12 +673,20 @@ void ConvertZeroMat(int rst, string eleFile, int largestR) {
 				  << "    " << rst << endl;
 			count++;
 		}
+		else if (id > largestR) {
+			notDefinedR[id] = { a, b, c, d };
+			if(forcedChange)
+				ssOut << setw(5) << tempInt
+					  << "   " << setw(5) << a
+					  << " " << setw(5) << b
+					  << " " << setw(5) << c
+					  << " " << setw(5) << d
+					  << "    " << rst << endl;
+			else
+				ssOut << str << endl;
+		}
 		else 
 			ssOut << str << endl;
-		
-		if (id > largestR) {
-			notDefinedR[id] = { a, b, c, d };
-		}
 	}
 	ifs.close();
 
@@ -710,7 +718,12 @@ void ConvertZeroMat(int rst, string eleFile, int largestR) {
 								  nodeVec[aPair.second[3]]) * 0.25;
 			cout << "   " << center << endl;
 		}
+		if(!forcedChange){
+			cout<<"-> MC codes will not be generated because it may not work due to the undefined regions"<<endl;
+			return false;
+		}
 	}
+	return true;
 }
 
 #endif
