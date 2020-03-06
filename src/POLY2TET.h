@@ -28,10 +28,12 @@ void PrintSmesh(string fileName, vector<vector<int>>, vector<pair<ThreeVector, i
 string StringSplitterFirst(string str, string del);
 string StringSplitterLast(string str, string del);
 void TetgenCall(int p_argc, char ** p_argv);
-map<int, double> AnalyzeTet(string tetFile);
+map<int, double> AnalyzeTet(string tetFile, bool oldVer=false);
 bool ChkDegenTet(ThreeVector anchor, ThreeVector p2, ThreeVector p3, ThreeVector p4, double &vol6);
+bool ChkDegenTet2(ThreeVector p0, ThreeVector p1, ThreeVector p2, ThreeVector p3, double& vol6);
 double FixDegenTet(ThreeVector& anchor, ThreeVector& p2, ThreeVector& p3, ThreeVector& p4, double &vol6);
 double FixDegenTet2(ThreeVector& anchor, ThreeVector& p2, ThreeVector& p3, ThreeVector& p4, double &vol6);
+double FixDegenTet3(ThreeVector& anchor, ThreeVector& p2, ThreeVector& p3, ThreeVector& p4, double &vol6);
 int  PrintVolume(string tetFile, ostream& os);
 bool ConvertZeroMat(int rst, string eleFile, int largestR, bool forcedChange);
 
@@ -410,7 +412,7 @@ void TetgenCall(int p_argc, char ** p_argv)
 	tetrahedralize(&b, &in, NULL, &addin, &bgmin);
 }
 
-map<int, double> AnalyzeTet(string tetFile) {
+map<int, double> AnalyzeTet(string tetFile, bool oldVer) {
 	cout << "Reading " + tetFile + ".node ... " << flush;
 	ifstream ifsNode(tetFile + ".node");
 	string str;
@@ -453,10 +455,20 @@ map<int, double> AnalyzeTet(string tetFile) {
 
 		for (vector<int> aTet : eleVec) {
 			double vol6;
-			if (ChkDegenTet(nodeVec[aTet[0]], nodeVec[aTet[1]], nodeVec[aTet[2]], nodeVec[aTet[3]], vol6)) {
-				cout << endl <<"   degenerated tet " << ++degenCount << " ("+to_string(aTet[4])+") "<< setw(6) <<"--> " <<flush;
-				double move = FixDegenTet2(nodeVec[aTet[0]], nodeVec[aTet[1]], nodeVec[aTet[2]], nodeVec[aTet[3]], vol6);
-				cout << "fixed (moved "<<move<<" cm)" ;
+			if(oldVer){
+				if (ChkDegenTet(nodeVec[aTet[0]], nodeVec[aTet[1]], nodeVec[aTet[2]], nodeVec[aTet[3]], vol6)) {
+					cout << endl <<"   degenerated tet " << ++degenCount << " ("+to_string(aTet[4])+") "<< setw(6) <<"--> " <<flush;
+					double move;
+					move = FixDegenTet2(nodeVec[aTet[0]], nodeVec[aTet[1]], nodeVec[aTet[2]], nodeVec[aTet[3]], vol6);
+					cout << "fixed (moved "<<move<<" cm)" ;
+				}
+			}else{
+				if (ChkDegenTet2(nodeVec[aTet[0]], nodeVec[aTet[1]], nodeVec[aTet[2]], nodeVec[aTet[3]], vol6)) {
+					cout << endl <<"   degenerated tet " << ++degenCount << " ("+to_string(aTet[4])+") "<< setw(6) <<"--> " <<flush;
+					double move;
+					move = FixDegenTet3(nodeVec[aTet[0]], nodeVec[aTet[1]], nodeVec[aTet[2]], nodeVec[aTet[3]], vol6);
+					cout << "fixed (moved "<<move<<" cm)" ;
+				}
 			}
 			volMap[aTet[4]] += vol6;
 		}
@@ -502,6 +514,27 @@ bool ChkDegenTet(ThreeVector anchor, ThreeVector p2, ThreeVector p3, ThreeVector
 		(p4 - fMiddle).mag());
 
 	return (vol6 < 1e-9*fMaxSize*fMaxSize*fMaxSize);
+}
+
+bool ChkDegenTet2(ThreeVector p0, ThreeVector p1, ThreeVector p2, ThreeVector p3, double& vol6) {
+	double hmin = 4.e-9;
+
+	//Calculate volume
+	vol6 = std::abs((p1 - p0).cross(p2 - p0).dot(p3 - p0));
+
+	//calculate face areas squared
+	double ss[4];
+	ss[0] = ((p1 - p0).cross(p2 - p0)).mag2();
+	ss[1] = ((p2 - p0).cross(p3 - p0)).mag2();
+	ss[2] = ((p3 - p0).cross(p1 - p0)).mag2();
+	ss[3] = ((p2 - p1).cross(p3 - p1)).mag2();
+
+	//find face with max area
+	int k=0;
+	for(int i=0;i<4;++i){if(ss[i]>ss[k]) k=i;}
+
+	//check: vol^2 / s^2 <= hmin^2
+	return (vol6*vol6 <= ss[k]*hmin*hmin);
 }
 
 double FixDegenTet(ThreeVector& anchor, ThreeVector& p2, ThreeVector& p3, ThreeVector& p4, double& vol6){
@@ -594,6 +627,53 @@ double FixDegenTet2(ThreeVector& anchor, ThreeVector& p2, ThreeVector& p3, Three
 		}
 		else totalMove += move;
 		degen = ChkDegenTet(pointVec[0], pointVec[1], pointVec[2], pointVec[3], vol6);
+	}
+	anchor = pointVec[0];
+	p2 = pointVec[1];
+	p3 = pointVec[2];
+	p4 = pointVec[3];
+	return totalMove;
+}
+
+double FixDegenTet3(ThreeVector& anchor, ThreeVector& p2, ThreeVector& p3, ThreeVector& p4, double &vol6) {
+	vector<ThreeVector> pointVec = { anchor, p2, p3, p4 };
+	vector<ThreeVector> upVector;
+	for (int i = 0; i < 4; i++) {
+		ThreeVector up = (pointVec[(i + 2) % 4] - pointVec[(i + 1) % 4]).cross(pointVec[(i + 3) % 4] - pointVec[(i + 1) % 4]);
+		up = up.unit();
+		if (up.dot(pointVec[i] - pointVec[(i + 1) % 4]) < 0) {
+			up = -up;
+		}
+		upVector.push_back(up);
+	}
+	double minHeight(DBL_MAX);
+	vector<ThreeVector> midVector;
+	vector<ThreeVector> cenVector;
+	int minP(-1);
+	for (int i = 0; i < 4; i++) {
+		ThreeVector u = pointVec[(i + 1) % 4] - pointVec[i];
+		double height = -upVector[i].dot(u);
+		ThreeVector proj = pointVec[i] - upVector[i] * height;
+		ThreeVector mid = (pointVec[(i + 1) % 4] + pointVec[(i + 2) % 4] + pointVec[(i + 3) % 4]) / 3.;
+		midVector.push_back(mid - proj);
+		cenVector.push_back(mid + upVector[i] * height);
+		if (height > minHeight) continue;
+		minHeight = height;
+		minP = i;
+	}
+
+	bool degen = true;
+	double totalMove(0.);
+	double move = pow(vol6, 1. / 3.)*0.0001;
+	if (move > 0.0001) move = 0.00001;
+	while (degen) {
+		pointVec[minP] += upVector[minP] * move;
+		if ((cenVector[minP] - pointVec[minP]).dot(midVector[minP]) > 0) {
+			pointVec[minP] += midVector[minP] * move;
+			totalMove += move * 1.41421356237;
+		}
+		else totalMove += move;
+		degen = ChkDegenTet2(pointVec[0], pointVec[1], pointVec[2], pointVec[3], vol6);
 	}
 	anchor = pointVec[0];
 	p2 = pointVec[1];

@@ -10,14 +10,7 @@ filelist=("PHANTOM.cc"
           "include")
 
 ##Generate new folder
-new_dir=$1"_Geant4"
-new_dir_base=$1"_Geant4"
-num=1;
-while [ -d $new_dir ]; do
-	new_dir=${new_dir_base}"_"${num}
-	num=`expr $num + 1`
-done
-
+new_dir=$4
 mkdir ${new_dir}
 
 for file in "${filelist[@]}"; do
@@ -25,15 +18,13 @@ for file in "${filelist[@]}"; do
 done
 
 ##Specify the phantom names
-find ${new_dir} -type f -exec sed -i -e "s/PHANTOM/$1/g" -e "s/NEWDIR/${new_dir}/g" {} \;
+find ${new_dir} -type f -exec sed -i "s/{PHANTOM}/$1/g" {} \;
 
 ##Specify beam size
 area=`expr $2 \* $3 \* 4`
 sed -i -e "s/{halfx}/$2/g" -e "s/{halfy}/$3/g" -e "s/{area}/${area}/g" ${new_dir}"/example.in"
 
-##Rename PHANTOM.cc ane example.in
+##Rename MRCP_AM_2.cc ane example.in
 mv ${new_dir}"/PHANTOM.cc" ${new_dir}"/"$1".cc"
 
-##export path
-#export G4TET_dir=${new_dir}
 echo "Geant4 files were generated in "${new_dir} 
