@@ -245,7 +245,7 @@ void FileGen::GenerateG4(){
 	}
 
 	//generate Geant4 files
-        system(("./.Geant4_gen.sh "+phantomName + " " + to_string(beamHX) + " " + to_string(beamHZ)
+        system(("./formats/Geant4_gen.sh "+phantomName + " " + to_string(beamHX) + " " + to_string(beamHZ)
                +" "+ baseDir + dir_G4).c_str());
 }
 
@@ -298,7 +298,7 @@ void FileGen::GenerateM6(){
 	stringstream ss; ss.precision(4); ss<<fixed;
 	ss<<halfXYZ<<" "<<beamHX<<" "<<beamHZ;
 	int largest = *pCellVec.rbegin();
-	auto fp = popen(("./.MCNP6_gen.sh "+phantomName + " "
+	auto fp = popen(("./formats/MCNP6_gen.sh "+phantomName + " "
 			         + ss.str() + " "
 					 + to_string(pCellVec.size()) + " " + to_string(largest)
 			         + " " + baseDir + dir_M6).c_str(), "r");
@@ -360,7 +360,7 @@ void FileGen::GeneratePH(){
 	ThreeVector halfXYZ = (box_max - box_min)*0.5 + ThreeVector(1, 1, 1);
 	stringstream ss; ss.precision(4); ss<<fixed;
 	ss<<halfXYZ<<" "<<beamHX<<" "<<beamHZ;
-	auto fp = popen(("./.PHITS_gen.sh "+phantomName + " "
+	auto fp = popen(("./formats/PHITS_gen.sh "+phantomName + " "
 			         + ss.str() + " " + baseDir+dir_PH).c_str(), "r");
 	char buff[50];
 	fgets(buff, 50, fp); pclose(fp);
