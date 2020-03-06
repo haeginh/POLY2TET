@@ -203,7 +203,7 @@ void tet2inp::PrintCell(string filename, map<int, double> densityMap){
 		ofs.precision(9);
 		ofs<<"vol="<<vol.second<<endl;
 	}
-	ofs<<" 99999           0  u=2 "<<endl;
+	ofs<<" 99999     0      0  u=2 "<<endl;
 	ofs<<"c -----------------------------------------------";
 	ofs.close();
 }

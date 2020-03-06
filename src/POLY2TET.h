@@ -18,7 +18,7 @@ using namespace std;
 
 void FixObj(string fileName); //for HUREL internal use.
 int ConvertOBJ(string fileName);
-vector<vector<int>> GetRepFaces(vector<vector<int>> faceVec); // get representative faces for each shells
+vector<vector<int>> GetRepFaces(vector<vector<int>> faceVec, int numShells); // get representative faces for each shells
 vector<pair<ThreeVector, int>> GetRegionList(vector<vector<int>> repFaces, vector<ThreeVector> vVec);
 vector<vector<int>> SeparateShell(vector<vector<int>> facePool);
 vector<vector<vector<int>>> SeparateAndGetShells(vector<vector<int>> facePool);
@@ -102,9 +102,9 @@ int ConvertOBJ(string fileName) {
 		<< "   " << faceVec.size() << " faces" << endl
 		<< "   " << shellCount << " shells" << endl;
 
-	vector<vector<int>>            repFaces = GetRepFaces(faceVec);
+	vector<vector<int>>            repFaces = GetRepFaces(faceVec,shellCount);
 	vector<pair<ThreeVector, int>> regions  = GetRegionList(repFaces, pointVec);
-	cout << "   separated into " << repFaces.size() << " shells" << endl << endl;
+	cout <<'\r'<<"   separated into " << repFaces.size() << " shells" << endl << endl;
 	PrintNode(fileName.substr(0, fileName.size() - 4) + ".node", pointVec);
 	cout << fileName.substr(0, fileName.size() - 4) + ".node was exported" << endl;
 //	PrintFace(fileName.substr(0, fileName.size() - 4) + ".face", faceVec);
@@ -116,7 +116,7 @@ int ConvertOBJ(string fileName) {
 	return regionVec.back();
 }
 
-vector<vector<int>> GetRepFaces(vector<vector<int>> faceVec) {
+vector<vector<int>> GetRepFaces(vector<vector<int>> faceVec, int numShells) {
 	int prevID = faceVec[0][3];
 	vector<vector<int>> facePool;
 	vector<vector<int>> repFaces;
@@ -124,6 +124,7 @@ vector<vector<int>> GetRepFaces(vector<vector<int>> faceVec) {
 		facePool.push_back({ faceVec[i][0], faceVec[i][1], faceVec[i][2] });
 
 		if (i==faceVec.size()-1 || faceVec[i][3] != faceVec[i+1][3]) {
+			cout<<'\r'<<"   Separating shells..."<<faceVec[i][3]<<"/"<<numShells<<flush;
 			vector<vector<int>> extracted = SeparateShell(facePool);
 			for (vector<int> &extF : extracted) {
 				extF.push_back(prevID);
@@ -132,7 +133,7 @@ vector<vector<int>> GetRepFaces(vector<vector<int>> faceVec) {
 			facePool.clear();
 		}
 		prevID = faceVec[i][3];
-	}
+	}cout<<endl;
 	return repFaces;
 }
 

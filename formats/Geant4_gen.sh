@@ -23,7 +23,7 @@ find ${new_dir} -type f -exec sed -i "s/{PHANTOM}/$1/g" {} \;
 ##Specify beam size
 area=`expr $2 \* $3 \* 4`
 sed -i -e "s/{halfx}/$2/g" -e "s/{halfy}/$3/g" -e "s/{area}/${area}/g" ${new_dir}"/example.in"
-sed -i "s/{PHANTOM}/$1/g"  ${new_dir}"/CMakeLists"
+sed -i "s/{PHANTOM}/$1/g"  ${new_dir}"/CMakeLists.txt"
 
 ##Rename MRCP_AM_2.cc ane example.in
 mv ${new_dir}"/PHANTOM.cc" ${new_dir}"/"$1".cc"

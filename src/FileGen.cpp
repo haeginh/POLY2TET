@@ -47,13 +47,14 @@ void FileGen::ReadMatFile(string matFile, MAT matFormat){
 		char* token;
 		int zaid;
 		double fraction;
-		string MaterialName;
 		double density;
 
 		while(!ifs.eof())
 		{
 			ifs >> read_data;                   //ex) 'C' RBM
+			string MaterialName;
 			ifs >> MaterialName;                //ex)  C 'RBM'
+			if(MaterialName.empty()) break;
 			ifs >> read_data;
 			density = std::atof(read_data);     //ex) 1.30
 			ifs >> read_data;                   //ex) g/cm3
@@ -147,11 +148,12 @@ void FileGen::GenerateMCNP6Mat(string fileName){
 		ofs<<"C "<<matN.second<<" "<<densityMap[matN.first]<<" g/cm3"<<endl;
 		bool firstLine(true);
 		for(auto elements:matMap[matN.first]){
-			if(firstLine)
+			if(elements.second==0) continue;
+			if(firstLine){
 				ofs<<setw(w+8)<<"m"+to_string(matN.first)<<setw(10)<<elements.first<<-elements.second<<endl;
-			else{
-				ofs<<setw(w+8)<<" "<<setw(10)<<elements.first<<-elements.second<<endl;
 				firstLine=false;
+			}else{
+				ofs<<setw(w+8)<<" "<<setw(10)<<elements.first<<-elements.second<<endl;
 			}
 		}
 		ofs<<"C"<<endl;
@@ -166,8 +168,10 @@ void FileGen::GeneratePhitsMat(string fileName){
 	for(auto matN:matNameMap){
 		ofs<<"$ "<<matN.second<<" "<<densityMap[matN.first]<<" g/cm3"<<endl;
 		ofs<<"MAT["<<matN.first<<"]"<<endl;
-		for(auto elements:matMap[matN.first])
+		for(auto elements:matMap[matN.first]){
+				if(elements.second==0) continue;
 				ofs<<setw(5)<<" "<<setw(10)<<elements.first<<-elements.second<<endl;
+		}
 		ofs<<"mt"<<matN.first<<endl;
 	}
 	ofs.close();
@@ -303,10 +307,11 @@ void FileGen::GenerateM6(){
 					 + to_string(pCellVec.size()) + " " + to_string(largest)
 			         + " " + baseDir + dir_M6).c_str(), "r");
 	pclose(fp);
+	GenerateMCNP6Mat(baseDir+dir_M6+"/"+loweredPhan+".material");
 	ofstream ofs(baseDir+dir_M6+"/"+phantomName+"_MCNP6.i", ios::out | ios::app);
 	int w = floor(log10((double)largest))+2;
 	ofs<<setw(w)<<1<<setw(w)<<pCellVec[0]<<endl;
-	for(size_t i=1;i<pCellVec.size()-1;i++)
+	for(size_t i=1;i<pCellVec.size();i++)
 		ofs<<setw(w+15)<<i+1<<setw(w)<<pCellVec[i]<<endl;
 	ofs.close();
 	cout<<"MCNP6 input file was generated as "+baseDir+dir_M6+"/"+phantomName+"_MCNP6.i"<<endl;

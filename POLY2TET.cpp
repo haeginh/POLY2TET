@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 	// Argument parser
 	for (int i = 1; i < argc-1; i++) {
 		string argStr = string(argv[i]);
-		if(argStr.substr(0,1)!="-") PrintUsage();
+		if(argStr.substr(0,1)!="-") {PrintUsage();return -1;}
 		if (argStr == "-c") {
 			maxVolID = atoi(argv[++i]);
 			continue;
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 			else if (options[j] == 'p')
 				pFlag = true;
 			else
-				PrintUsage();
+				{PrintUsage();return -1;}
 		}
 	}
 

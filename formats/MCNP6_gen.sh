@@ -14,7 +14,7 @@ impNo=`expr $7 + 2`
 beamHX=$5
 beamHZ=$6
 
-ln  -s ${new_dir}"/../"$1".material" ${new_dir}"/"${phantom}.material
+#cp   ${new_dir}"/../"$1".material" ${new_dir}"/"${phantom}.material
 
 sed -i -e "s/{PHANTOM}/${phantom}/g" \
        -e "s/{c1}/${c1}/g" -e "s/{c2}/${c2}/g" -e "s/{c3}/${c3}/g" \
