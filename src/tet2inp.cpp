@@ -80,10 +80,22 @@ tet2inp::tet2inp(string inp_filename, string out_filename, vector<ThreeVector> n
 		for(auto ele:ele_iter.second){
 			// arrange node ID
 			tie(n1, n2, n3, n4) = ele;
-			if(whole2ext.insert(make_pair(n1, nodeID)).second) nodeID++;
-			if(whole2ext.insert(make_pair(n2, nodeID)).second) nodeID++;
-			if(whole2ext.insert(make_pair(n3, nodeID)).second) nodeID++;
-			if(whole2ext.insert(make_pair(n4, nodeID)).second) nodeID++;
+			if(whole2ext.insert({n1, nodeID}).second){
+				node_map[organID].push_back(node_vector[n1]);
+				nodeID++;
+			}
+			if(whole2ext.insert({n2, nodeID}).second){
+				node_map[organID].push_back(node_vector[n2]);
+				nodeID++;
+			}
+			if(whole2ext.insert({n3, nodeID}).second){
+				node_map[organID].push_back(node_vector[n3]);
+				nodeID++;
+			}
+			if(whole2ext.insert({n4, nodeID}).second){
+				node_map[organID].push_back(node_vector[n4]);
+				nodeID++;
+			}
 
 			// add tet vol.
 			ThreeVector fV21 = node_vector[n2] - node_vector[n1];
@@ -94,10 +106,7 @@ tet2inp::tet2inp(string inp_filename, string out_filename, vector<ThreeVector> n
 		}
 		vol_map[organID] = totVol6 / 6.;
 
-		// set new maps for node/ele
-		for(auto iter:whole2ext)
-			node_map[organID].push_back(node_vector[iter.first]);
-
+		// set new maps for ele
 		for(auto ele:ele_iter.second){
 			tie(n1, n2, n3, n4) = ele;
 			newele_map[organID].push_back(ELE(whole2ext[n1]+1, whole2ext[n2]+1, whole2ext[n3]+1, whole2ext[n4]+1));
