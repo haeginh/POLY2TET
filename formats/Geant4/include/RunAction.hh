@@ -57,7 +57,7 @@ public:
 	void SetBeamArea(G4double _area){beamArea=_area;}
   
 private:
-	TetModelImport* tetData;
+	TetModelImport* voxData;
 	Run*            fRun;
 	G4int           numOfEvent;
 	G4int           runID;

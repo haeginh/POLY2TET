@@ -120,11 +120,12 @@ vector<vector<int>> GetRepFaces(vector<vector<int>> faceVec, int numShells) {
 	int prevID = faceVec[0][3];
 	vector<vector<int>> facePool;
 	vector<vector<int>> repFaces;
+	int count(1);
 	for (size_t i = 0; i < faceVec.size(); i++) {
 		facePool.push_back({ faceVec[i][0], faceVec[i][1], faceVec[i][2] });
 
 		if (i==faceVec.size()-1 || faceVec[i][3] != faceVec[i+1][3]) {
-			cout<<'\r'<<"   Separating shells..."<<faceVec[i][3]<<"/"<<numShells<<flush;
+			cout<<'\r'<<"   Separating shells..."<<count++<<"/"<<numShells<<flush;
 			vector<vector<int>> extracted = SeparateShell(facePool);
 			for (vector<int> &extF : extracted) {
 				extF.push_back(prevID);
