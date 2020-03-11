@@ -72,8 +72,9 @@ int ConvertOBJ(string fileName) {
 	ThreeVector point;
 	vector<ThreeVector> pointVec;
 	vector<vector<int>> faceVec;
+	int numShells(0);
 	vector<int> regionVec;
-	int a, b, c, id(0), shellCount(0);
+	int a, b, c, id(0), shellCount(0), prevID(-1);
 	while (getline(ifs, dump)) {
 		stringstream ss(dump);
 		if (!(ss >> firstStr)) continue;
@@ -88,6 +89,7 @@ int ConvertOBJ(string fileName) {
 		else if (firstStr == "g") {
 			ss >> dump;
 			id = atoi(StringSplitterFirst(dump, "_").c_str());
+			if(prevID!=id) {numShells++; prevID = id;}
 			if (id <= 0) {
 				cerr << "Wrong id number " << id << " exists" << endl;
 				return -1;
@@ -102,7 +104,7 @@ int ConvertOBJ(string fileName) {
 		<< "   " << faceVec.size() << " faces" << endl
 		<< "   " << shellCount << " shells" << endl;
 
-	vector<vector<int>>            repFaces = GetRepFaces(faceVec,shellCount);
+	vector<vector<int>>            repFaces = GetRepFaces(faceVec,numShells);
 	vector<pair<ThreeVector, int>> regions  = GetRegionList(repFaces, pointVec);
 	cout <<'\r'<<"   separated into " << repFaces.size() << " shells" << endl << endl;
 	PrintNode(fileName.substr(0, fileName.size() - 4) + ".node", pointVec);
