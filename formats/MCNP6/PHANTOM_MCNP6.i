@@ -41,7 +41,7 @@ read file=./{PHANTOM}.tally
 C ----------------------------------------------------------------------------
 C MATERIAL DATA FOR EACH ORGAN/TISSUE
 C ----------------------------------------------------------------------------
-read file=../{PHANTOM}.material
+read file=./{PHANTOM}.material
 C ----------------------------------------------------------------------------
 C EMBED is required for embedding a mesh geometry into MCNP6 input
 embed2 meshgeo=abaqus                      $ Format specification  
