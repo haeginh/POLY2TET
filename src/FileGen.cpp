@@ -300,7 +300,7 @@ void FileGen::GenerateM6(){
 //folder generation & print mcnp6 input file
 	ThreeVector halfXYZ = (box_max - box_min)*0.5 + ThreeVector(1, 1, 1);
 	stringstream ss; ss.precision(4); ss<<fixed;
-	ss<<halfXYZ<<" "<<beamHX<<" "<<beamHZ;
+	ss<<halfXYZ;
 	int largest = *pCellVec.rbegin();
 	auto fp = popen(("./formats/MCNP6_gen.sh "+phantomName + " "
 			         + ss.str() + " "
@@ -310,7 +310,7 @@ void FileGen::GenerateM6(){
 	GenerateMCNP6Mat(baseDir+dir_M6+"/"+loweredPhan+".material");
 	ofstream ofs(baseDir+dir_M6+"/"+phantomName+"_MCNP6.i", ios::out | ios::app);
 	int w = floor(log10((double)largest))+2;
-	ofs<<setw(w)<<1<<setw(w)<<pCellVec[0]<<endl;
+	ofs<<"       matcell="<<setw(w)<<1<<setw(w)<<pCellVec[0]<<endl;
 	for(size_t i=1;i<pCellVec.size();i++)
 		ofs<<setw(w+15)<<i+1<<setw(w)<<pCellVec[i]<<endl;
 	ofs.close();

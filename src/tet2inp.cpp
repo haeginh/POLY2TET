@@ -208,7 +208,7 @@ void tet2inp::PrintCell(string filename, map<int, double> densityMap){
 	for(auto vol:vol_map){
 		ofs<<" "<<setfill('0')<<setw(w)<<vol.first<<" "<<setfill(' ')<<setw(w)<<vol.first;
 		ofs.precision(4);
-		ofs<<setw(9)<<fixed<<densityMap[vol.first]<<"  0  u=2 ";
+		ofs<<setw(10)<<fixed<<-densityMap[vol.first]<<"  0  u=2 ";
 		ofs.precision(9);
 		ofs<<"vol="<<vol.second<<endl;
 	}

@@ -5,7 +5,7 @@ C ****************************************************************************
 C ----------------------------------------------------------------------------
 C PSUEDO CELLS FOR ABAQUS
 C ----------------------------------------------------------------------------
-read file=./{PHANTOM}.cell
+read file={PHANTOM}.cell
 C ----------------------------------------------------------------------------
 C LEGACY CELLS                                       
 C ----------------------------------------------------------------------------
@@ -29,22 +29,21 @@ imp:p,e 1 {impNo}r 0               $ Importance
 prdmp 10000000 10000000  -1    $ Print and dump cycle          
 rand  seed=RNSEED              $ Random seed                   
 nps 10000000                   $ Number of particles           
-sdef par=p erg=1.00 pos=0 -50 0 x=d1  y=-100 z=d2 vec=0 1 0 dir=1 
-SI1 -{beamHX} {beamHX}
+sdef par=p erg=1.00 x=d1  y=-100 z=d2 vec=0 1 0 dir=1 
+SI1 -{HX} {HX}
 SP1 0 1
-SI2 -{beamHZ} {beamHZ}
+SI2 -{HZ} {HZ}
 SP2 0 1                         $ General source definition     
 C ----------------------------------------------------------------------------
 C TALLIES FOR EACH ORGAN/TISSUE
 C ----------------------------------------------------------------------------
-read file=./{PHANTOM}.tally
+read file={PHANTOM}.tally
 C ----------------------------------------------------------------------------
 C MATERIAL DATA FOR EACH ORGAN/TISSUE
 C ----------------------------------------------------------------------------
-read file=./{PHANTOM}.material
+read file={PHANTOM}.material
 C ----------------------------------------------------------------------------
 C EMBED is required for embedding a mesh geometry into MCNP6 input
 embed2 meshgeo=abaqus                      $ Format specification  
-       mgeoin=./{PHANTOM}.inp
+       mgeoin={PHANTOM}.inp
        background=99999                    $ Cell number of the background
-       matcell=
