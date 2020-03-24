@@ -12,8 +12,7 @@ file = {PHANTOM}_PHITS.pin
  ntetelem =       10000     # Number of tetra element allowed in sub-block
  maxbnk   =     1000000     # (D=10000) maximum bank memory length
  itetra   =           0     # (D=0) tetra data is read(=1)/write(=2) on binary
- file(7)  = (path to 'xsdir.jnd' file) # nuclear data input file name
- file(20) = (path to egs folder)       # Directory library data for EGS5
+ file(1)  = (path to PHITS installation foleder)
  negs     =           1     # (D=-1) 1:EGS
  ipegs    =           0     # [EGS](D=0) 0:Full
 
@@ -22,10 +21,10 @@ file = {PHANTOM}_PHITS.pin
    s-type =   2             # mono-energetic rectangular-solid source
      proj =   photon        # kind of incident particle
        e0 =   1.00          # energy of beam [MeV]
-       x0 =  -{beamHX} # minimum position of x-axis [cm]
-       x1 =   {beamHX} # maximum position of x-axis [cm]
-       z0 =  -{beamHZ} # minimum position of z-axis [cm]
-       z1 =   {beamHZ} # maximum position of z-axis [cm]
+       x0 =  -{HX} # minimum position of x-axis [cm]
+       x1 =   {HX} # maximum position of x-axis [cm]
+       z0 =  -{HZ} # minimum position of z-axis [cm]
+       z1 =   {HZ} # maximum position of z-axis [cm]
        y0 =  -50.0          # minimum position of y-axis [cm]
        y1 =  -50.0          # maximum position of y-axis [cm]
       dir =   0.000         # z-direction of beam [cosine]

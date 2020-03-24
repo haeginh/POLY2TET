@@ -364,7 +364,7 @@ void FileGen::GeneratePH(){
 //folder generation & print mcnp6 input file
 	ThreeVector halfXYZ = (box_max - box_min)*0.5 + ThreeVector(1, 1, 1);
 	stringstream ss; ss.precision(4); ss<<fixed;
-	ss<<halfXYZ<<" "<<beamHX<<" "<<beamHZ;
+	ss<<halfXYZ;
 	auto fp = popen(("./formats/PHITS_gen.sh "+phantomName + " "
 			         + ss.str() + " " + baseDir+dir_PH).c_str(), "r");
 	char buff[50];
