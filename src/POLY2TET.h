@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <float.h>
+#include <stdexcept>
 
 using namespace std;
 
@@ -104,13 +105,19 @@ int ConvertOBJ(string fileName) {
 		<< "   " << faceVec.size() << " faces" << endl
 		<< "   " << shellCount << " shells" << endl;
 
-	vector<vector<int>>            repFaces = GetRepFaces(faceVec,numShells);
+    vector<vector<int>> repFaces;
+
+    //shell sep. & detect holes
+    try{repFaces = GetRepFaces(faceVec,numShells);}
+    catch(pair<int, int> edge){
+        cerr<<endl<<endl<<"Polygon Defect: a hole/inversed face nearby the edge ("<< pointVec[edge.first]<<")-("<<pointVec[edge.second]<<")"<<endl;
+        exit(100);
+    }
+
 	vector<pair<ThreeVector, int>> regions  = GetRegionList(repFaces, pointVec);
 	cout <<'\r'<<"   separated into " << repFaces.size() << " shells" << endl << endl;
 	PrintNode(fileName.substr(0, fileName.size() - 4) + ".node", pointVec);
 	cout << fileName.substr(0, fileName.size() - 4) + ".node was exported" << endl;
-//	PrintFace(fileName.substr(0, fileName.size() - 4) + ".face", faceVec);
-//	cout << fileName.substr(0, fileName.size() - 4) + ".face was exported" << endl;
 	PrintSmesh(fileName.substr(0, fileName.size() - 4) + ".smesh", faceVec, regions);
 	cout << fileName.substr(0, fileName.size() - 4) + ".smesh was exported" << endl;
 
@@ -118,27 +125,30 @@ int ConvertOBJ(string fileName) {
 	return regionVec.back();
 }
 
+enum polygonDefect{hasHole, reversed};
 vector<vector<int>> GetRepFaces(vector<vector<int>> faceVec, int numShells) {
-	int prevID = faceVec[0][3];
-	vector<vector<int>> facePool;
-	vector<vector<int>> repFaces;
-	int count(1);
-	for (size_t i = 0; i < faceVec.size(); i++) {
-		facePool.push_back({ faceVec[i][0], faceVec[i][1], faceVec[i][2] });
+    int prevID = faceVec[0][3];
+    vector<vector<int>> facePool;
+    vector<vector<int>> repFaces;
+    int count(1);
+    for (size_t i = 0; i < faceVec.size(); i++) {
 
-		if (i==faceVec.size()-1 || faceVec[i][3] != faceVec[i+1][3]) {
-			cout<<'\r'<<"   Separating shells..."<<count++<<"/"<<numShells<<flush;
-			vector<vector<int>> extracted = SeparateShell(facePool);
-			for (vector<int> &extF : extracted) {
-				extF.push_back(prevID);
-			}
-			repFaces.insert(repFaces.end(), extracted.begin(), extracted.end());
-			facePool.clear();
-		}
-		prevID = faceVec[i][3];
-	}cout<<endl;
-	return repFaces;
+        facePool.push_back({ faceVec[i][0], faceVec[i][1], faceVec[i][2] });
+
+        if (i==faceVec.size()-1 || faceVec[i][3] != faceVec[i+1][3]) {
+            cout<<'\r'<<"   Separating shells..."<<count++<<"/"<<numShells<<flush;
+            vector<vector<int>> extracted = SeparateShell(facePool);
+            for (vector<int> &extF : extracted) {
+                extF.push_back(prevID);
+            }
+            repFaces.insert(repFaces.end(), extracted.begin(), extracted.end());
+            facePool.clear();
+        }
+        prevID = faceVec[i][3];
+    }cout<<endl;
+    return repFaces;
 }
+
 
 vector<pair<ThreeVector, int>> GetRegionList(vector<vector<int>> repFaces, vector<ThreeVector> vVec) {
 	vector<pair<ThreeVector, int>> regionList;
@@ -152,102 +162,67 @@ vector<pair<ThreeVector, int>> GetRegionList(vector<vector<int>> repFaces, vecto
 }
 
 vector<vector<int>> SeparateShell(vector<vector<int>> facePool) {
-	vector<vector<int>> repFaces;
-	
-	set<int> vToSearch, vToSearchNext;
-	vToSearch.insert(facePool.back().begin(), facePool.back().end());
-	vector<vector<int>> rest = facePool;
-	repFaces.push_back(rest.back());
+    vector<vector<int>> repFaces; //representing faces for each of the separated shells
 
-	rest.pop_back();
+    map<pair<int, int>, int> edgeMap; //edge, faceID(0, 1, 2)
+    for(size_t i=0;i<facePool.size();i++){
+        edgeMap[{facePool[i][0],facePool[i][1]}]=i;
+        edgeMap[{facePool[i][1],facePool[i][2]}]=i;
+        edgeMap[{facePool[i][2],facePool[i][0]}]=i;
+    }
 
-	vector<vector<int>> restNext;
-	while (1) { // loop to detect all sepearated shells
-		while (1) { // loop for finding all faces for each separated shell
-			for (vector<int> f : rest) {
-				if (vToSearch.find(f[0]) != vToSearch.end()) {
-					vToSearchNext.insert(f[1]);
-					vToSearchNext.insert(f[2]);
-				}
-				else if (vToSearch.find(f[1]) != vToSearch.end()) {
-					vToSearchNext.insert(f[0]);
-					vToSearchNext.insert(f[2]);
-				}
-				else if (vToSearch.find(f[2]) != vToSearch.end()) {
-					vToSearchNext.insert(f[0]);
-					vToSearchNext.insert(f[1]);
-				}
-				else restNext.push_back(f);
-			}
-			if (vToSearchNext.size() == 0) break;
+    while(edgeMap.size()){
+        //setting the starting point
+        auto fs = facePool[edgeMap.begin()->second];
+        vector<pair<int, int>> collectedEdges = {{fs[0],fs[2]},{fs[2],fs[1]},{fs[1],fs[0]}};
+        edgeMap.erase({fs[0],fs[1]});
+        edgeMap.erase({fs[1],fs[2]});
+        edgeMap.erase({fs[2],fs[0]});
+        repFaces.push_back(fs);
 
-			vToSearch = vToSearchNext;
-			vToSearchNext.clear();
-			rest = restNext;
-			restNext.clear();
-		}
-		if (restNext.size() == 0) break;
-		rest = restNext; restNext.clear();
+        while(collectedEdges.size()){
+             vector<pair<int, int>> collectedEdges_next;
+            for(auto &edge:collectedEdges){
+                if(edgeMap.find(edge)==edgeMap.end()){
+                    auto iter = find(collectedEdges.begin(), collectedEdges.end(), make_pair(edge.second ,edge.first));
+                    if(iter!=collectedEdges.end()){
+                        continue;
+                    }
+                    auto iter2 = find(collectedEdges_next.begin(), collectedEdges_next.end(), make_pair(edge.second, edge.first));
+                    if(iter2!=collectedEdges_next.end()){
+                        collectedEdges_next.erase(iter2); continue;
+                    }
+                    throw edge;
+                }
+                auto f = facePool[edgeMap[edge]];
 
-		vToSearch.clear();
-		vToSearch.insert(rest.back().begin(), rest.back().end());
-		repFaces.push_back(rest.back());
-		rest.pop_back();
-	}
-	return repFaces;
-}
+                //erase edges of the collected face
+                edgeMap.erase({f[0],f[1]});
+                edgeMap.erase({f[1],f[2]});
+                edgeMap.erase({f[2],f[0]});
 
-vector<vector<int>> SeparateShell(vector<vector<int>> facePool, vector<int>& numFace) {
-	vector<vector<int>> repFaces;
-	numFace.clear();
+                //collect new edges
+                if(edge==make_pair(f[0],f[1])){
+                    collectedEdges_next.push_back({f[0],f[2]});
+                    collectedEdges_next.push_back({f[2],f[1]});
+                }
+                else if(edge==make_pair(f[1],f[2])){
+                    collectedEdges_next.push_back({f[1],f[0]});
+                    collectedEdges_next.push_back({f[0],f[2]});
+                }
+                else if(edge==make_pair(f[2],f[0])){
+                    collectedEdges_next.push_back({f[2],f[1]});
+                    collectedEdges_next.push_back({f[1],f[0]});
+                 }
+                else{
+                    cerr<<"Code Error!"<<flush;getchar();
+                }
+            }
+            collectedEdges = collectedEdges_next;
+         }
+    }
 
-	set<int> vToSearch, vToSearchNext;
-	vToSearch.insert(facePool.back().begin(), facePool.back().end());
-	vector<vector<int>> rest = facePool;
-	repFaces.push_back(rest.back());
-
-	rest.pop_back();
-
-	vector<vector<int>> restNext;
-	while (1) { // loop to detect all sepearated shells
-		int count(0);
-		while (1) { // loop for finding all faces for each separated shell
-			for (vector<int> f : rest) {
-				if (vToSearch.find(f[0]) != vToSearch.end()) {
-					vToSearchNext.insert(f[1]);
-					vToSearchNext.insert(f[2]);
-					count++;
-				}
-				else if (vToSearch.find(f[1]) != vToSearch.end()) {
-					vToSearchNext.insert(f[0]);
-					vToSearchNext.insert(f[2]);
-					count++;
-				}
-				else if (vToSearch.find(f[2]) != vToSearch.end()) {
-					vToSearchNext.insert(f[0]);
-					vToSearchNext.insert(f[1]);
-					count++;
-				}
-				else restNext.push_back(f);
-			}
-			if (vToSearchNext.size() == 0) break;
-
-			vToSearch = vToSearchNext;
-			vToSearchNext.clear();
-			rest = restNext;
-			restNext.clear();
-		}
-
-		if (restNext.size() == 0) break;
-		rest = restNext; restNext.clear();
-
-		vToSearch.clear();
-		vToSearch.insert(rest.back().begin(), rest.back().end());
-		repFaces.push_back(rest.back());
-		numFace.push_back(count);
-		rest.pop_back();
-	}
-	return repFaces;
+    return repFaces;
 }
 
 vector<vector<vector<int>>> SeparateAndGetShells(vector<vector<int>> facePool) {
