@@ -29,7 +29,7 @@ imp:p,e 1 {impNo}r 0               $ Importance
 prdmp 10000000 10000000  -1    $ Print and dump cycle          
 rand  seed=RNSEED              $ Random seed                   
 nps 1000000                   $ Number of particles           
-sdef par=p erg=1.00 x=d1  y=-100 z=d2 vec=0 1 0 dir=1 
+sdef par=p erg=1.00 x=d1  y=-50 z=d2 vec=0 1 0 dir=1 
 SI1 -{HX} {HX}
 SP1 0 1
 SI2 -{HZ} {HZ}
