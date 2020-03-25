@@ -30,10 +30,8 @@
 #include "G4UImanager.hh"
 
 RunAction::RunAction(TetModelImport* _tetData, G4String _output)
-:voxData(_tetData), fRun(0), numOfEvent(0), runID(0), outputFile(_output), beamArea(1)
-{
-	fMessenger = new RunActionMessenger(this);
-}
+:voxData(_tetData), fRun(0), numOfEvent(0), runID(0), outputFile(_output)
+{}
 
 RunAction::~RunAction()
 {}
@@ -67,7 +65,7 @@ void RunAction::EndOfRunAction(const G4Run* aRun)
 	PrintResult(G4cout);
 
 	// print by std::ofstream
-	std::ofstream ofs(outputFile.c_str());
+	std::ofstream ofs((std::to_string(runID) + "_" + outputFile).c_str());
 	PrintResult(ofs);
 	ofs.close();
 }
@@ -85,7 +83,7 @@ void RunAction::PrintResult(std::ostream &out)
 	    << "=====================================================================" << G4endl
 	    << "organ ID| "
 		<< setw(19) << "Organ Mass (g)"
-		<< setw(19) << "Dose (Gy*cm^2)"
+		<< setw(19) << "Dose (Gy/source)"
 		<< setw(19) << "Relative Error" << G4endl;
 
 	out.precision(3);
@@ -98,7 +96,7 @@ void RunAction::PrintResult(std::ostream &out)
 
 		out << setw(8)  << itr.first << "| "
 			<< setw(19) << fixed      << itr.second/g;
-		out	<< setw(19) << scientific << meanDose/(joule/kg) * (beamArea/cm2);
+		out	<< setw(19) << scientific << meanDose/(joule/kg);
 		out	<< setw(19) << fixed      << relativeE << G4endl;
 	}
 	out << "=====================================================================" << G4endl << G4endl;

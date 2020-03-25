@@ -203,8 +203,6 @@ void FileGen::ReadTetNode(){
 		if(box_max.getZ()<node.getZ()) box_max.setZ(node.getZ());
 		else if(box_min.getZ()>node.getZ()) box_min.setZ(node.getZ());
 	}
-	beamHX = floor((box_max.getX()-box_min.getX())*0.5)+1;
-	beamHZ = floor((box_max.getZ()-box_min.getZ()*0.5))+1;
 	ThreeVector center = (box_max + box_min)*0.5;
 	for(auto &node:nodeVec)	node -= center;
 }
@@ -224,7 +222,7 @@ void FileGen::ReadTetEle(){
 		ThreeVector fV21 = nodeVec[b] - nodeVec[a];
 		ThreeVector fV31 = nodeVec[c] - nodeVec[a];
 		ThreeVector fV41 = nodeVec[d] - nodeVec[a];
-		double signed_vol = fV21.cross(fV31).dot(fV41);
+		double signed_vol = fV21.cross(fV31).dot(fV41)/6;
 		volMap[id] = volMap[id] + std::fabs(signed_vol);
 	}ifs.close();
 }
@@ -249,7 +247,10 @@ void FileGen::GenerateG4(){
 	}
 
 	//generate Geant4 files
-        system(("./formats/Geant4_gen.sh "+phantomName + " " + to_string(beamHX) + " " + to_string(beamHZ)
+	ThreeVector halfXYZ = (box_max - box_min)*0.5 + ThreeVector(1,1,1);
+	stringstream ss; ss.precision(4); ss<<fixed; 
+        ss<<halfXYZ.getX()<<" "<<halfXYZ.getZ();
+        system(("./formats/Geant4_gen.sh "+phantomName + " " + ss.str()
                +" "+ baseDir + dir_G4).c_str());
 }
 
@@ -298,7 +299,7 @@ void FileGen::GenerateM6(){
 	ifs.close();
 
 //folder generation & print mcnp6 input file
-	ThreeVector halfXYZ = (box_max - box_min)*0.5 + ThreeVector(1, 1, 1);
+	ThreeVector halfXYZ = (box_max - box_min)*0.5 + ThreeVector(1,1,1);
 	stringstream ss; ss.precision(4); ss<<fixed;
 	ss<<halfXYZ;
 	int largest = *pCellVec.rbegin();
@@ -350,19 +351,19 @@ void FileGen::GeneratePH(){
 	if(w<5) w=5;
 	ofstream ofsCell(baseDir + dir_PH + "/" +phantomName+".cell");
 	ofsCell<<"$ CELLS FOR {PHANTOM}"<<endl;
-	ofsCell<<" "<<setfill('0')<<setw(w)<<"99999"<<setw(w+2)<<"0"<<setw(9)<<"-20"<<setw(5)<<" "<<"  "<<"U=15000 LAT=3 tfile=../{PHANTOM}"<<endl;
-	ofsCell<<" "<<setfill('0')<<setw(w)<<"99998"<<setw(w+2)<<"0"<<setw(9)<<"-10"<<setw(5)<<" "<<"  "<<"FILL=15000"<<endl;
-	ofsCell<<" "<<setfill('0')<<setw(w)<<"99997"<<setw(w+2)<<"0"<<setw(9)<<"-20"<<setw(5)<<"10"<<endl;
-	ofsCell<<" "<<setfill('0')<<setw(w)<<"99996"<<setw(w+2)<<"0"<<setw(9)<<"-90"<<setw(5)<<"20"<<endl;
-	ofsCell<<" "<<setfill('0')<<setw(w)<<"99995"<<setw(w+2)<<"-1"<<setw(9)<<"90"<<endl;
+	ofsCell<<" "<<setfill('0')<<setw(w)<<"99999"<<setfill(' ')<<setw(w+2)<<"0"<<setw(9)<<"-20"<<setw(5)<<" "<<"  "<<"U=15000 LAT=3 tfile=../{PHANTOM}"<<endl;
+	ofsCell<<" "<<setfill('0')<<setw(w)<<"99998"<<setfill(' ')<<setw(w+2)<<"0"<<setw(9)<<"-10"<<setw(5)<<" "<<"  "<<"FILL=15000"<<endl;
+	ofsCell<<" "<<setfill('0')<<setw(w)<<"99997"<<setfill(' ')<<setw(w+2)<<"0"<<setw(9)<<"-20"<<setw(5)<<"10"<<endl;
+	ofsCell<<" "<<setfill('0')<<setw(w)<<"99996"<<setfill(' ')<<setw(w+2)<<"0"<<setw(9)<<"-90"<<setw(5)<<"20"<<endl;
+	ofsCell<<" "<<setfill('0')<<setw(w)<<"99995"<<setfill(' ')<<setw(w+2)<<"-1"<<setw(9)<<"90"<<endl;
 	for(auto volM:volMap){
-		ofsCell<<" "<<setfill('0')<<setw(w)<<volM.first<<setw(w+2)<<volM.first<<setw(9)<<densityMap[volM.first]
+		ofsCell<<right<<" "<<setfill('0')<<setw(w)<<volM.first<<setfill(' ')<<setw(w+2)<<volM.first<<setw(9)<<-densityMap[volM.first]
 		       <<setw(5)<<"-90"<<"  "<<left<<setw(w+4)<<"u="+to_string(volM.first)<<"VOL="<<volM.second<<endl;
 	}
 	ofsCell.close();
 
 //folder generation & print mcnp6 input file
-	ThreeVector halfXYZ = (box_max - box_min)*0.5 + ThreeVector(1, 1, 1);
+	ThreeVector halfXYZ = (box_max - box_min)*0.5 + ThreeVector(1,1,1);
 	stringstream ss; ss.precision(4); ss<<fixed;
 	ss<<halfXYZ;
 	auto fp = popen(("./formats/PHITS_gen.sh "+phantomName + " "

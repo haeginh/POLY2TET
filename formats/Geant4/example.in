@@ -12,7 +12,7 @@
 # Source setting
 /gps/pos/type Plane
 /gps/pos/shape Square
-/gps/pos/centre 0 -5 0 m
+/gps/pos/centre 0 -50 0 cm
 /gps/pos/halfx {halfx} cm
 /gps/pos/halfy {halfy} cm
 /gps/pos/rot1 1 0 0
@@ -20,9 +20,6 @@
 /gps/direction 0 1 0
 /gps/particle gamma
 /gps/energy 1 MeV
-
-# Set beamArea
-/result/beamArea {area} cm2
 
 # Set the nps
 /run/beamOn 1000000

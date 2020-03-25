@@ -36,7 +36,6 @@ private:
 
 	int numNode;
 	ThreeVector box_max, box_min, center;
-	int beamHX, beamHZ;
 	vector<ThreeVector> nodeVec;
 
 	map<int, double> densityMap;

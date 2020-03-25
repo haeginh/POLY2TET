@@ -41,7 +41,6 @@
 #include "Run.hh"
 #include "TetModelImport.hh"
 
-class RunActionMessenger;
 class RunAction : public G4UserRunAction
 {
 public:
@@ -54,7 +53,6 @@ public:
 	virtual void EndOfRunAction(const G4Run*);
 
 	void PrintResult(std::ostream &out);
-	void SetBeamArea(G4double _area){beamArea=_area;}
   
 private:
 	TetModelImport* voxData;
@@ -62,44 +60,6 @@ private:
 	G4int           numOfEvent;
 	G4int           runID;
 	G4String        outputFile;
-	G4double        beamArea;
-	RunActionMessenger* fMessenger;
-};
-
-//simple messenger for RunAction
-#include "G4UImessenger.hh"
-#include "G4UIdirectory.hh"
-#include "G4UIcmdWithADoubleAndUnit.hh"
-
-class RunActionMessenger: public G4UImessenger
-{
-public:
-	RunActionMessenger(RunAction* _runAction)
-	:G4UImessenger(), fRunAction(_runAction)
-	{
-		fRunActionDir = new G4UIdirectory("/result/");
-		fBeamAreaCmd  = new G4UIcmdWithADoubleAndUnit("/result/beamArea", this);
-	}
-	virtual ~RunActionMessenger(){
-		delete fRunActionDir;
-		delete fBeamAreaCmd;
-	}
-
-	virtual void SetNewValue(G4UIcommand* command, G4String newValue){
-		if(command==fBeamAreaCmd){
-			fRunAction->SetBeamArea(fBeamAreaCmd->GetNewDoubleValue(newValue));
-		}
-	}
-
-private:
-	RunAction*                   fRunAction;
-	G4UIdirectory*               fRunActionDir;
-	G4UIcmdWithADoubleAndUnit*   fBeamAreaCmd;
 };
 
 #endif
-
-
-
-
-
