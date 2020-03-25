@@ -7,7 +7,7 @@ file = {PHANTOM}_PHITS.pin
 [ Parameters ]
  icntl    =           0     # (D=0) 3:ECH 5:NOR 6:SRC 7,8:GSH 11:DSH 12:DUMP
  maxcas   =     1000000     # (D=10) number of particles per one batch
- maxbch   =          10     # (D=10) number of batches
+ maxbch   =           1     # (D=10) number of batches
  itetvol  =           0     # (D=0) =1 Volume calculation for tetrahedrons
  ntetelem =       10000     # Number of tetra element allowed in sub-block
  maxbnk   =     1000000     # (D=10000) maximum bank memory length
