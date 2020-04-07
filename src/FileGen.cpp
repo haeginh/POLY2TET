@@ -209,6 +209,7 @@ ThreeVector FileGen::ReadTetNode(){
 	}
 	ThreeVector center = (box_max + box_min)*0.5;
 	for(auto &node:nodeVec)	node -= center;
+    return center;
 }
 
 void FileGen::ReadTetEle(){
