@@ -30,7 +30,7 @@
 #include "G4UImanager.hh"
 
 RunAction::RunAction(TetModelImport* _tetData, G4String _output)
-:voxData(_tetData), fRun(0), numOfEvent(0), runID(0), outputFile(_output)
+:tetData(_tetData), fRun(0), numOfEvent(0), runID(0), outputFile(_output)
 {}
 
 RunAction::~RunAction()
@@ -87,7 +87,7 @@ void RunAction::PrintResult(std::ostream &out)
 		<< setw(19) << "Relative Error" << G4endl;
 
 	out.precision(3);
-	auto massMap = voxData->GetMassMap();
+    auto massMap = tetData->GetMassMap();
 	for(auto itr : massMap){
 		G4double meanDose    = edepMap[itr.first].first  / itr.second / numOfEvent;
 		G4double squareDoese = edepMap[itr.first].second / (itr.second*itr.second);

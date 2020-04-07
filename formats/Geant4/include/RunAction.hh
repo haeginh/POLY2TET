@@ -55,7 +55,7 @@ public:
 	void PrintResult(std::ostream &out);
   
 private:
-	TetModelImport* voxData;
+    TetModelImport* tetData;
 	Run*            fRun;
 	G4int           numOfEvent;
 	G4int           runID;
