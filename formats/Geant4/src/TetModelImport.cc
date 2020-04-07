@@ -105,7 +105,7 @@ void TetModelImport::DataRead(G4String eleFile, G4String nodeFile)
 	G4ThreeVector center = (boundingBox_Max+boundingBox_Min)*0.5;
 	for(auto &vertex:vertexVector)	vertex -= center;
 	boundingBox_Max -= center; boundingBox_Min-=center;
-
+    G4cout<<"   -> PHANTOM WAS SHIFTED BY "<< center/cm << " cm" <<G4endl;
 	ifpNode.close();
 
 	// Read *.ele file

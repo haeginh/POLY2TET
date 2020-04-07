@@ -88,9 +88,9 @@ void DetectorConstruction::SetupWorldGeometry()
 
 	// Define the phantom container (10-cm margins from the bounding box of phantom)
 	//
-	G4Box* containerSolid = new G4Box("phantomBox", phantomSize.getX()*0.5,
-										            phantomSize.getY()*0.5,
-										            phantomSize.getZ()*0.5);
+    G4Box* containerSolid = new G4Box("phantomBox", phantomSize.getX()*0.5 + 1*cm,
+                                                    phantomSize.getY()*0.5 + 1*cm,
+                                                    phantomSize.getZ()*0.5 + 1*cm);
 
 	container_logic = new G4LogicalVolume(containerSolid, vacuum, "phantomLogical");
 

@@ -4,6 +4,7 @@
 #include <iterator>
 #include <sstream>
 #include <iomanip>
+#include <cfloat>
 
 template <typename T>
 vector<size_t> tet2inp::sort_indexes(const vector<T> &v) {

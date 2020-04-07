@@ -25,7 +25,7 @@ public:
 	void GeneratePH();
 
 private:
-	void ReadTetNode();
+    ThreeVector ReadTetNode();
 	void ReadTetEle();
 	void GenerateMCNP6Mat(string fileName);
 	void GeneratePhitsMat(string fileName);

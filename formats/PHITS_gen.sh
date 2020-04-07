@@ -20,4 +20,8 @@ sed -i -e "s/{PHANTOM}/${phantom}/g" \
        -e "s/{XX}/${XX}/g"    -e "s/{XY}/${XY}/g"    -e "s/{XZ}/${XZ}/g"    \
        ${newFile}
 sed -i "s/{PHANTOM}/${phantom}/g" ${new_dir}"/"${phantom}".cell"
-echo ${newFile} 
+
+##copy ele file
+cp ${new_dir}"/../"${phantom}.ele ${new_dir}"/"
+
+echo ${newFile}

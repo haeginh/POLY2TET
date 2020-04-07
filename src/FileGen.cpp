@@ -22,7 +22,11 @@ FileGen::FileGen(string _phantomName, string _baseDir)
 :phantomName(_phantomName), baseDir(_baseDir), numNode(0)
 {
 	cout<<"Read node file..."<<flush;
-	ReadTetNode(); cout<<"done"<<endl;
+    ThreeVector center = ReadTetNode();
+    cout<<"done"<<endl;
+    cout<<"## NOTE: "<<phantomName<<" phantom was shifted by ("
+        <<center.getX()<<", "<<center.getY()<<", "<<center.getZ()<<") cm for all MC codes"<<endl;
+    cout<<"         (.ele and .node file in <"+baseDir+"> were not shifted)"<<endl;
 }
 
 FileGen::~FileGen() {}
@@ -177,7 +181,7 @@ void FileGen::GeneratePhitsMat(string fileName){
 	ofs.close();
 }
 
-void FileGen::ReadTetNode(){
+ThreeVector FileGen::ReadTetNode(){
 	//read node file
 	ifstream ifs(baseDir+phantomName+".node");
 	ifs>>numNode;
@@ -346,12 +350,12 @@ void FileGen::GeneratePH(){
 	//material file generation
 	GeneratePhitsMat(baseDir+dir_PH+"/"+phantomName+".material");
 
-	//	generate cell file
+    //generate cell file
 	int w = floor(log10(matNameMap.rbegin()->first))+1;
 	if(w<5) w=5;
 	ofstream ofsCell(baseDir + dir_PH + "/" +phantomName+".cell");
 	ofsCell<<"$ CELLS FOR {PHANTOM}"<<endl;
-	ofsCell<<" "<<setfill('0')<<setw(w)<<"99999"<<setfill(' ')<<setw(w+2)<<"0"<<setw(9)<<"-20"<<setw(5)<<" "<<"  "<<"U=15000 LAT=3 tfile=../{PHANTOM}"<<endl;
+    ofsCell<<" "<<setfill('0')<<setw(w)<<"99999"<<setfill(' ')<<setw(w+2)<<"0"<<setw(9)<<"-20"<<setw(5)<<" "<<"  "<<"U=15000 LAT=3 tfile=./{PHANTOM}"<<endl;
 	ofsCell<<" "<<setfill('0')<<setw(w)<<"99998"<<setfill(' ')<<setw(w+2)<<"0"<<setw(9)<<"-10"<<setw(5)<<" "<<"  "<<"FILL=15000"<<endl;
 	ofsCell<<" "<<setfill('0')<<setw(w)<<"99997"<<setfill(' ')<<setw(w+2)<<"0"<<setw(9)<<"-20"<<setw(5)<<"10"<<endl;
 	ofsCell<<" "<<setfill('0')<<setw(w)<<"99996"<<setfill(' ')<<setw(w+2)<<"0"<<setw(9)<<"-90"<<setw(5)<<"20"<<endl;
@@ -362,7 +366,19 @@ void FileGen::GeneratePH(){
 	}
 	ofsCell.close();
 
-//folder generation & print mcnp6 input file
+    //generate node file
+    stringstream ssNode;
+    ssNode.precision(20);
+    ssNode.setf(ios_base::fixed, ios_base::floatfield);
+    ssNode << nodeVec.size() << "  3  0  0" << endl;
+    for (size_t i = 0; i < nodeVec.size();i++) {
+        ssNode <<setw(4)<< i <<"    "<< nodeVec[i] << endl;
+    }
+    ofstream ofsNode(baseDir + dir_PH + "/" +phantomName+".node");
+    ofsNode << ssNode.str();
+    ofsNode.close();
+
+    //folder generation & print mcnp6 input file
 	ThreeVector halfXYZ = (box_max - box_min)*0.5 + ThreeVector(1,1,1);
 	stringstream ss; ss.precision(4); ss<<fixed;
 	ss<<halfXYZ;
