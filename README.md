@@ -18,6 +18,8 @@ make
   -mat/m : material file in MCNP6 format
   -mat/p : material file in PHITS format (will be implemented very soon)
 ```
+### Input PM phantom
+Input PM phantom should be prepared as OBJ file format that includes the whole phantom; there is no need to prepare OBJ files for each organ. In the OBJ file, each organ should be defined as a shell group named as the corresponding organ ID. Note that for the user’s convenience, POLY2TET allows to add descriptions to be followed after organ ID, but those two needs to be separated by an underscore (e.g., 9500 or 9500_Liver).
 ## Monte Carlo dose calculation
 For the Monte Carlo dose calculations, the corresponding code should be installed in the computer.
 ### MCNP6 (> version 6 / to use um file: > version 6.2)
@@ -37,3 +39,5 @@ cmake .
 make
 ./(phantom_name)
 ```
+## Reference
+...
