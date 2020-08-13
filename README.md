@@ -40,4 +40,4 @@ make
 ./(phantom_name)
 ```
 ## Reference
-...
+Han H et al.,2020, POLY2TET: A Computer Program for Conversion of Computational Human Phantoms from Polygonal Mesh to Tetrahedral Mesh, J. Radiol. Prot.(on process)
