@@ -419,7 +419,7 @@ map<int, double> AnalyzeTet(string tetFile, bool oldVer) {
 		getline(ifsEle, str);
 		stringstream ss(str);
 		ss >> id >> a >> b >> c >> d >> id;
-		eleVec.push_back({ a, b, c, d, id });
+        eleVec.push_back({ a-1, b-1, c-1, d-1, id });
 	}
 	cout << "done" << endl;
 	
@@ -688,9 +688,9 @@ int PrintVolume(string tetFile, ostream& os) {
 		getline(ifsEle, str);
 		stringstream ss(str);
 		ss >> id >> a >> b >> c >> d >> id;
-		ThreeVector v21 = nodeVec[b] - nodeVec[a];
-		ThreeVector v31 = nodeVec[c] - nodeVec[a];
-		ThreeVector v41 = nodeVec[d] - nodeVec[a];
+        ThreeVector v21 = nodeVec[b-1] - nodeVec[a-1];
+        ThreeVector v31 = nodeVec[c-1] - nodeVec[a-1];
+        ThreeVector v41 = nodeVec[d-1] - nodeVec[a-1];
 		double volume6 = v21.cross(v31).dot(v41);
 		volumeMap[id] += volume6;
 	}
