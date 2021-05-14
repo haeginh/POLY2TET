@@ -75,7 +75,8 @@ int ConvertOBJ(string fileName) {
 	vector<vector<int>> faceVec;
 	int numShells(0);
 	vector<int> regionVec;
-	int a, b, c, id(0), shellCount(0), prevID(-1);
+	int id(0), shellCount(0), prevID(-1);
+	int face[4];
 	while (getline(ifs, dump)) {
 		stringstream ss(dump);
 		if (!(ss >> firstStr)) continue;
@@ -84,12 +85,18 @@ int ConvertOBJ(string fileName) {
 			pointVec.push_back(point);
 		}
 		else if (firstStr == "f") {
-			ss >> a >> b >> c;
-			faceVec.push_back({ a-1, b-1, c-1, id });
+			string faceStr;
+			int i(0);
+			while(ss>>faceStr){
+				if(faceStr.empty()) break;
+				face[i++]=atoi(faceStr.substr(0, faceStr.find('/')).c_str());
+			}		
+			faceVec.push_back({ face[0]-1, face[1]-1, face[2]-1, id });
+			if(i==4) faceVec.push_back({ face[2]-1, face[3]-1, face[0]-1, id });
 		}
 		else if (firstStr == "g") {
 			ss >> dump;
-			id = atoi(StringSplitterFirst(dump, "_").c_str());
+			id = atoi(dump.substr(0, dump.find('_')).c_str());
 			if(prevID!=id) {numShells++; prevID = id;}
 			if (id <= 0) {
 				cerr << "Wrong id number " << id << " exists" << endl;

@@ -177,6 +177,8 @@ int main(int argc, char *argv[])
 		int volRename= rename((tetFileName.substr(0,tetFileName.size()-2) + "_vol.txt").c_str(),
 				(baseDir+phantomName+".vol").c_str());
 		if(eleRename||nodeRename||volRename)	cerr<<"WARNING-rename failed."<<endl;
+		system(("rm "+fileName.substr(0, fileName.size()-3)+"node").c_str());
+		system(("rm "+fileName.substr(0, fileName.size()-3)+"smesh").c_str());
 
 		cout<<endl<<"--Conversion was done: "<<fileName.substr(0, fileName.size()-3)+"1.node/ele were exported"<<endl;
 	}
