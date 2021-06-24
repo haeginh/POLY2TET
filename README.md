@@ -1,4 +1,4 @@
-# POLY2TET
+# POLY2TET (only for Linux)
 Program described in the jounal paper, "POLY2TET: A Computer Program for Conversion of Computational Human Phantoms from Polygonal Mesh to Tetrahedral Mesh", submitted to Journal of Radiological Protection.
 
 ## Installation
