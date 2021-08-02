@@ -37,7 +37,7 @@ In the folder where Geant4 source code is generated, compile the source code for
 ```
 cmake .
 make
-./(phantom_name)
+./(phantom_name) -m (macro_file_name) -o (ouput_file_name)
 ```
 ## Reference
 Han H et al.,2020, POLY2TET: A Computer Program for Conversion of Computational Human Phantoms from Polygonal Mesh to Tetrahedral Mesh, J. Radiol. Prot.(on process)
