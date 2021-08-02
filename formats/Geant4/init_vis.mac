@@ -13,7 +13,7 @@
 /run/initialize
 
 # Source setting
-/control/execute source.mac
+# /control/execute source.mac
 
 # Visualization setting
 /control/execute vis.mac
