@@ -12,6 +12,7 @@ void PrintUsage(){
 	cout<<"-m : generate MCNP6 input file"<<endl;
 	cout<<"-p : generate PHITS input file"<<endl;
 	cout<<"-c : positive integer number to replace zero-region number (and not defined regions, when used as -rc)"<<endl;
+	cout<<"-s : without Y option. allow Steiner point on the polygon"<<endl;
 	cout<<"-mat/m : material file in MCNP6 format"<<endl;
 	cout<<"-mat/p : material file in PHITS format"<<endl;
 }
@@ -19,7 +20,7 @@ void PrintUsage(){
 int main(int argc, char *argv[])
 {
 	int maxVolID(-1);
-	bool gFlag(false), mFlag(false), pFlag(false), rFlag(false), oFlag(false), oldFlag(false);
+	bool gFlag(false), mFlag(false), pFlag(false), rFlag(false), oFlag(false), oldFlag(false), sFlag;
 	MAT matFormat; string matFile;
 
 	// Argument parser
@@ -28,6 +29,10 @@ int main(int argc, char *argv[])
 		if(argStr.substr(0,1)!="-") {PrintUsage();return -1;}
 		if (argStr == "-c") {
 			maxVolID = atoi(argv[++i]);
+			continue;
+		}
+		else if (argStr == "-s") {
+			sFlag = true;
 			continue;
 		}
 		else if (argStr == "-rc") {
@@ -135,7 +140,8 @@ int main(int argc, char *argv[])
 		for(int i=0;i<3;i++) p_argv[i]=new char[50];
 
 		strcpy(p_argv[0], string("tetgen").c_str());
-		strcpy(p_argv[1], string("-p/0.0001YAFT0.000000001").c_str());
+		if(sFlag) strcpy(p_argv[1], string("-p/0.0001YAFT0.000000001").c_str());
+		else      strcpy(p_argv[1], string("-pAFT0.000000001").c_str());
 		strcpy(p_argv[2], smeshName.c_str());
 
 		bool repeat(true);
